@@ -1,3 +1,4 @@
 Vagrantfile
 .vagrant
-webhook
+.vscode
+apikeys
