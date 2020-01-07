@@ -38,6 +38,7 @@ def get_args():
     """
     parser = argparse.ArgumentParser()
     parser.add_argument(
+        "-d",
         "--debug",
         action="store_true",
         help="run without sending a message to the discord channel",
