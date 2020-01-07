@@ -44,14 +44,7 @@ def get_args():
         help="run without sending a message to the discord channel",
     )
     parser.add_argument(
-        "--daily",
-        action="store_true",
-        help="create a message that shows today's location",
-    )
-    parser.add_argument(
-        "--weekly",
-        action="store_true",
-        help="create a message that shows this week's locations",
+        "format", choices=["daily", "weekly"], help="specify format of message"
     )
     parser.add_argument(
         "-l",
@@ -182,21 +175,13 @@ def main():
     args = get_args()
     events = get_events()
 
-    if args.daily and args.weekly:
-        print("You cannot specify both --daily and --weekly. Exiting.")
-        sys.exit(1)
-
-    elif args.daily:
+    if args.format == "daily":
         message = build_daily_message(events, args.location)
         print(message)
 
-    elif args.weekly:
+    elif args.format == "weekly":
         message = build_weekly_message(events, args.location)
         print(message)
-
-    else:
-        print("You must specify either --daily or --weekly. Exiting.")
-        sys.exit(1)
 
     # Send the generated calender message to #food-as-a-service
     if not args.debug:
