@@ -52,6 +52,12 @@ def get_args():
         action="store_true",
         help="create a message that shows this week's locations",
     )
+    parser.add_argument(
+        "-l",
+        "--location",
+        default="5200 Paramount Parkway",
+        help="specify a source location to measure distance from truck",
+    )
 
     return parser.parse_args()
 
@@ -82,7 +88,7 @@ def get_events():
     return json.loads(events_string)
 
 
-def format_event(event):
+def format_event(event, source):
     """
     Adds new keys to event dictionary object resulting from GET request
     """
@@ -97,7 +103,7 @@ def format_event(event):
     ).strftime("%H:%M")
 
     directions_result = GMAPS.directions(
-        SOURCE,
+        source,
         event["streetaddress"],
         mode="driving",
         departure_time=event["start_datetime"],
@@ -118,7 +124,7 @@ def event_tostring(event):
     )
 
 
-def build_daily_message(events):
+def build_daily_message(events, source):
     """
     Construct the Discord message following the 'daily' message format.
     """
@@ -128,7 +134,7 @@ def build_daily_message(events):
     )
     event_tomorrow = False
     for event in events:
-        event = format_event(event)
+        event = format_event(event, source)
         if event["start_datetime"] - timedelta(days=1) < datetime.now(
             event["start_datetime"].tzinfo  # pylint: disable=bad-continuation
         ):
@@ -141,7 +147,7 @@ def build_daily_message(events):
     return message
 
 
-def build_weekly_message(events):
+def build_weekly_message(events, source):
     """
     Construct the Discord message following the 'daily' message format.
     """
@@ -150,7 +156,7 @@ def build_weekly_message(events):
         "_The Naked Empanada Upcoming Events..._"
     )
     for event in events:
-        event = format_event(event)
+        event = format_event(event, source)
         if event["start_datetime"] - timedelta(days=7) < datetime.now(
             event["start_datetime"].tzinfo  # pylint: disable=bad-continuation
         ):
@@ -180,11 +186,11 @@ def main():
         sys.exit(1)
 
     elif args.daily:
-        message = build_daily_message(events)
+        message = build_daily_message(events, args.location)
         print(message)
 
     elif args.weekly:
-        message = build_weekly_message(events)
+        message = build_weekly_message(events, args.location)
         print(message)
 
     else:
