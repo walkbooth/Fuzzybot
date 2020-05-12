@@ -100,7 +100,6 @@ def format_event(event, source):
         source,
         event["streetaddress"],
         mode="driving",
-        departure_time=event["start_datetime"],
     )
 
     event["distance"] = directions_result[0]["legs"][0]["distance"]["text"]
